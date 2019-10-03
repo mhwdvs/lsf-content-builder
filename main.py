@@ -1,7 +1,14 @@
-import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
 
-page = requests.get("https://livestreamfails.com/top")
-links = page.text
+url = "https://livestreamfails.com/top"
+browser = webdriver.Chrome()
+browser.get(url)
+html = browser.page_source
+
+soup = BeautifulSoup(html, 'lxml')
+a = soup.find('section', 'wrapper')
+
 
 # regex to get only links in the page
 # remove unwanted links (nav bar etc)
