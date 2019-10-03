@@ -65,3 +65,9 @@ for link in links:
 
 for i in links:
 	os.system("curl " + links[i] + " -o clip" + i)
+	os.system("ffmpeg -i clip" + i + ".mp4 -vf scale=1920:1080 out" + i + ".ts")
+
+
+#used ffmpeg to cocant 15 MPEG-2 files losslessly into a single MPEG-2 output file, which must then be reencoded into mp4
+os.system("""ffmpeg -i "concat:out1.ts|out2.ts|out3.ts|out4.ts|out5.ts|out6.ts|out7.ts|out8.ts|out9.ts|out10.ts|out11.ts|out12.ts|out13.ts|out14.ts|out15.ts" -c copy final.ts""")
+os.system("ffmpeg -i final.ts -o final.mp4")
