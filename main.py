@@ -6,6 +6,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 import lxml
 import re
+import os
 
 url = "https://livestreamfails.com/top"
 browser = webdriver.Chrome()
@@ -35,7 +36,7 @@ for link in links:
     browser = webdriver.Chrome()
     browser.get(link)
     delay = 5 #seconds
-    time = 2
+    clips = 0
 
     try:
         myElem = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'post-title')))
@@ -57,8 +58,10 @@ for link in links:
 
     print(links)
     print(titles)
-
-
+    clips = clips + 1
     # break loop when total video time is greater than 5 minutes
-    if time > 5:
+    if clips > 14:
         break
+
+for i in links:
+	os.system("curl " + links[i] + " -o clip" + i)
