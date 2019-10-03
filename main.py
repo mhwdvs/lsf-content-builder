@@ -27,6 +27,38 @@ links = []
 for link in soup.find_all("a", attrs={"href": re.compile("^https://livestreamfails.com/post/")}):
     links.append(link.get("href"))
 
+links = list(set(links)) # removes duplicate links (bcause there are 3 different links for each post; picture, title etc)
 print(links)
-
 # links is now an array/list of all the links to the top posts of the past 24 hours
+
+for link in links:
+    browser = webdriver.Chrome()
+    browser.get(link)
+    delay = 5 #seconds
+    time = 2
+
+    try:
+        myElem = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'post-title')))
+        print("Page is ready!")
+
+    except TimeoutException:
+        print("Page took too long to load!")
+
+    html = browser.page_source
+    soup = BeautifulSoup(html, 'lxml')
+
+    links = []
+    for link in soup.find_all("source", attrs={"src": re.compile("^https://stream.livestreamfails.com/video/")}):
+        links.append(link.get("src"))
+
+    titles = []
+    for link in soup.find_all("h4",{"class":"post-title"}):
+        titles.append(link.text)
+
+    print(links)
+    print(titles)
+
+
+    # break loop when total video time is greater than 5 minutes
+    if time > 5:
+        break
