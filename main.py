@@ -78,5 +78,3 @@ for i in range(len(videourls)):
 #os.system("""ffmpeg -i "concat:out1.ts|out2.ts|out3.ts|out4.ts|out5.ts|out6.ts|out7.ts|out8.ts|out9.ts|out10.ts|out11.ts|out12.ts|out13.ts|out14.ts|out15.ts" -c copy final.ts""")
 #os.system("ffmpeg -i final.ts -o final.mp4")
 os.system("ffmpeg-concat -t circleopen -d 100 -f jpg -o final.mp4 clip0.mp4 clip1.mp4")
-
-
