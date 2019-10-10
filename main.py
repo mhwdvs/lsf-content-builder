@@ -10,17 +10,15 @@ import os
 import subprocess
 
 # funtion to get duration of clip for use later
-def getDirtyLength(filename):
+def getLength(filename):
     result = subprocess.Popen(["ffprobe", "-show_streams", filename],
         stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
-    return [x for x in result.stdout.readlines() if "nb_frames" in x.decode()]
-
-def getCleanLength(filename):
-    dirty = getDirtyLength(filename)[0]
+    dirty = [x for x in result.stdout.readlines() if "nb_frames" in x.decode()]
+    dirty = dirty[0]
     clean = re.findall(r'\d+', str(dirty))
     return clean[0]
 
-print(getCleanLength("clip1.mp4"))
+print(getLength("clip1.mp4"))
 
 url = "https://livestreamfails.com/top"
 browser = webdriver.Chrome()
