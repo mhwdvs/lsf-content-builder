@@ -7,6 +7,20 @@ from selenium.webdriver.common.by import By
 import lxml
 import re
 import os
+import subprocess
+
+# funtion to get duration of clip for use later
+def getDirtyLength(filename):
+    result = subprocess.Popen(["ffprobe", "-show_streams", filename],
+        stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+    return [x for x in result.stdout.readlines() if "nb_frames" in x.decode()]
+
+def getCleanLength(filename):
+    dirty = getDirtyLength(filename)[0]
+    clean = re.findall(r'\d+', str(dirty))
+    return clean[0]
+
+print(getCleanLength("clip1.mp4"))
 
 url = "https://livestreamfails.com/top"
 browser = webdriver.Chrome()
@@ -65,16 +79,19 @@ for link in links:
     # break loop when total video time is greater than 5 minutes
     if clips > 1:
         break
-
+print("-------------------")
 print("All video urls:")
 print(videourls)
+print("-------------------")
 
+# Downloads and preprocesses all clips
 for i in range(len(videourls)):
     os.system("curl " + videourls[i] + " -o clip" + str(i) +".mp4")
-    os.system("ffmpeg -i clip" + i + ".mp4 -vf scale=1920:1080 out" + i + ".ts")
+    # all files will be made into 1080p, 24fps format to prevent any issues later on
+    os.system("ffmpeg -i clip" + i + ".mp4 -framerate 24 -vf scale=1920:1080 out" + i + ".ts")
+    # Get file duration
 
 
 #used ffmpeg to cocant 15 MPEG-2 files losslessly into a single MPEG-2 output file, which must then be reencoded into mp4
 #os.system("""ffmpeg -i "concat:out1.ts|out2.ts|out3.ts|out4.ts|out5.ts|out6.ts|out7.ts|out8.ts|out9.ts|out10.ts|out11.ts|out12.ts|out13.ts|out14.ts|out15.ts" -c copy final.ts""")
 #os.system("ffmpeg -i final.ts -o final.mp4")
-os.system("ffmpeg-concat -t circleopen -d 100 -f jpg -o final.mp4 clip0.mp4 clip1.mp4")
