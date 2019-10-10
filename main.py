@@ -9,6 +9,10 @@ import re
 import os
 import subprocess
 
+# define runtime variables
+fadetime = 24*3 #3 seconds
+fadein = fadetime
+
 # funtion to get duration of clip for use later
 def getLength(filename):
     result = subprocess.Popen(["ffprobe", "-show_streams", filename],
@@ -16,9 +20,7 @@ def getLength(filename):
     dirty = [x for x in result.stdout.readlines() if "nb_frames" in x.decode()]
     dirty = dirty[0]
     clean = re.findall(r'\d+', str(dirty))
-    return clean[0]
-
-print(getLength("clip1.mp4"))
+    return int(clean[0])
 
 url = "https://livestreamfails.com/top"
 browser = webdriver.Chrome()
@@ -84,12 +86,29 @@ print("-------------------")
 
 # Downloads and preprocesses all clips
 for i in range(len(videourls)):
-    os.system("curl " + videourls[i] + " -o clip" + str(i) +".mp4")
+    clipname = "clip" + str(i) + ".mp4"
+    outname = "out" + str(i) + ".mp4"
+
+    #download clip
+    os.system("curl " + videourls[i] + " -o " + clipname)
+
     # all files will be made into 1080p, 24fps format to prevent any issues later on
-    os.system("ffmpeg -i clip" + i + ".mp4 -framerate 24 -vf scale=1920:1080 out" + i + ".ts")
-    # Get file duration
+    os.system("ffmpeg -i " + clipname + " -vf scale=1920:1080,fps=fps=24 " + outname)
+
+    # Get file duration in frames
+    frames = getLength(outname)
+    print("")
+    print(frames)
+    print("")
+    fadeout = frames - fadetime
+    print(fadeout)
+    print("")
+    fadename = "faded" + str(i) + ".ts"
+    os.system("ffmpeg -i " + outname + """ -vf "fade=in:0:""" + str(fadein) + """" 1""" + outname)
+    os.system("ffmpeg -i 1" + outname + """ -vf "fade=out:"""+ str(fadeout) + ":" + str(fadetime) + """" 2""" + outname)
+    os.system("ffmpeg -i 2" + outname + " " + fadename)
 
 
-#used ffmpeg to cocant 15 MPEG-2 files losslessly into a single MPEG-2 output file, which must then be reencoded into mp4
-#os.system("""ffmpeg -i "concat:out1.ts|out2.ts|out3.ts|out4.ts|out5.ts|out6.ts|out7.ts|out8.ts|out9.ts|out10.ts|out11.ts|out12.ts|out13.ts|out14.ts|out15.ts" -c copy final.ts""")
-#os.system("ffmpeg -i final.ts -o final.mp4")
+# combines all faded files together and transcodes them back to mp4
+os.system("""ffmpeg -i "concat:faded0.ts|faded1.ts" -c copy final.ts""")
+os.system("ffmpeg -i final.ts final.mp4")
