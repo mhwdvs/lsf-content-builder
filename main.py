@@ -89,8 +89,8 @@ for link in links:
         titles.append(link.text)
 
     clips += 1
-    # break loop when the number of clips is 2
-    if clips > 1:
+    # break loop when the number of clips is 15
+    if clips > 14:
         break
 
 print("<------------------->")
@@ -131,8 +131,8 @@ print("")
 
 print("RUNNING FINAL CONCAT AND TRANSCODE ON CLIPS!")
 # combines all faded files together and transcodes them back to mp4
-os.system("""ffmpeg -i "concat:0.ts|1.ts" -c copy final.ts""")
-os.system("del 0.ts && del 1.ts")
+os.system("""ffmpeg -i "concat:0.ts|1.ts|2.ts|3.ts|4.ts|5.ts|6.ts|7.ts|8.ts|9.ts|10.ts|11.ts|12.ts|13.ts|14.ts" -c copy final.ts""")
+os.system("del 0.ts && del 1.ts && del 2.ts && del 3.ts && del 4.ts && del 5.ts && del 6.ts && del 7.ts && del 8.ts && del 9.ts && del 10.ts && del 11.ts && del 12.ts && del 13.ts && del 14.ts")
 os.system("ffmpeg -i final.ts final.mp4")
 os.system("del final.ts")
 print("Done!")
