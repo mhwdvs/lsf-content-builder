@@ -114,7 +114,7 @@ for i in range(len(videourls)):
 
     # all files will be made into 1080p, 24fps format to prevent any issues later on
     # this has to be done seperate from fades, because fadeout transition relies on number of frames, which changes
-    os.system("ffmpeg -i " + clipname + """ -c:a copy -vf scale=1920:1080,fps=fps=24,drawtext="fontfile=Lato-Bold.ttf:text='""" + str(titles[i]) +"""':fontcolor=white:fontsize=40:box=1:boxcolor=black@0.5:boxborderw=5:x=0:y=0" """ + outname)
+    os.system("ffmpeg -i " + clipname + """ -vf scale=1920:1080,fps=fps=24,drawtext="fontfile=Lato-Bold.ttf:text='""" + str(titles[i]) +"""':fontcolor=white:fontsize=40:box=1:boxcolor=black@0.5:boxborderw=5:x=0:y=0" """ + outname)
     os.system("del " + clipname)
 
     # Add overlay with clip title here
