@@ -8,6 +8,7 @@ import lxml
 import re
 import os
 import subprocess
+import threading
 
 print("<------------------>")
 print("LSF CONTENT BUILDER")
@@ -20,6 +21,8 @@ print("")
 # define runtime variables
 fadetime = 24*3 #3 seconds
 fadein = fadetime
+options = webdriver.Options()
+options.add_argument(--headless)
 
 # funtion to get duration of clip in frames
 def getLength(filename):
@@ -29,6 +32,25 @@ def getLength(filename):
     dirty = dirty[0]
     clean = re.findall(r'\d+', str(dirty))
     return int(clean[0])
+
+#define preprocessing function for threading
+def preprocess(videourl, title, filenumber):
+    print("Downloading clip " + filenumber + "!")
+    os.system("curl " + videourl + " -o " + "clip" + str(filenumber) + ".mp4")
+
+    # all files will be made into 1080p, 24fps format to prevent any issues later on
+    # this has to be done seperate from fades, because fadeout transition relies on number of frames, which changes
+    os.system("ffmpeg -i clip" + str(filenumber) + """.mp4 -vf scale=1920:1080,fps=fps=24,drawtext="fontfile=Lato-Bold.ttf:text='""" + str(title) +"""':fontcolor=white:fontsize=40:box=1:boxcolor=black@0.5:boxborderw=5:x=0:y=0" out""" + str(filenumber) + ".mp4")
+    os.system("del clip" + str(filenumber) + ".mp4")
+
+    outname = "out" + str(filenumber) + ".mp4"
+
+    frames = getLength(outname)     # Get file duration in frames
+    fadeout = frames - fadetime     # Gets the time in frames when the fadeout transition should begin
+
+    # adds in and out fades and transcodes to MPEG2 simultaneously
+    os.system("ffmpeg -i " + outname + """ -vf "fade=in:0:""" + str(fadein) + ",fade=out:"+ str(fadeout) + ":" + str(fadetime) + """" """ + str(filenumber) + ".mp4")
+    os.system("del " + outname)
 
 print("GETTING CLIPS:")
 url = "https://livestreamfails.com/top"
@@ -104,33 +126,14 @@ print("")
 # Downloads and preprocesses all clips
 print("DOWNLOADING + PROCESSING CLIPS!")
 for i in range(len(videourls)):
-    # have to create additional files for ffmpeg to operate 
-    clipname = "clip" + str(i) + ".mp4"
-    outname = "out" + str(i) + ".mp4"
-
-    #download clip
-    print("Downloading clip" + str(i) + "!")
-    os.system("curl " + videourls[i] + " -o " + clipname)
-
-    # all files will be made into 1080p, 24fps format to prevent any issues later on
-    # this has to be done seperate from fades, because fadeout transition relies on number of frames, which changes
-    os.system("ffmpeg -i " + clipname + """ -c:a copy -vf scale=1920:1080,fps=fps=24,drawtext="fontfile=Lato-Bold.ttf:text='""" + str(titles[i]) +"""':fontcolor=white:fontsize=40:box=1:boxcolor=black@0.5:boxborderw=5:x=0:y=0" """ + outname)
-    os.system("del " + clipname)
-
-    # Add overlay with clip title here
-
-    frames = getLength(outname)     # Get file duration in frames
-    fadeout = frames - fadetime     # Gets the time in frames when the fadeout transition should begin
-
-    # adds in and out fades and transcodes to MPEG2 simultaneously
-    os.system("ffmpeg -i " + outname + """ -vf "fade=in:0:""" + str(fadein) + ",fade=out:"+ str(fadeout) + ":" + str(fadetime) + """" """ + str(i) + ".mp4")
-    os.system("del " + outname)
+    x = threading.Thread(target=preprocess, args=(str(videourls[i]),str(titles[i]),str(i)))
+    x.start()
 
 print("<----------------------->")
 print("")
 
 print("RUNNING FINAL CONCAT AND TRANSCODE ON CLIPS!")
 # combines all faded files together and transcodes them back to mp4
-os.system("ffmpeg -safe 0 -f concat -i mylist.txt -c copy output.mp4")
+os.system("ffmpeg -fflags +igndts -safe 0 -f concat -i mylist.txt -c copy output.mp4")
 os.system("del 0.mp4 && del 1.mp4 && del 2.mp4 && del 3.mp4 && del 4.mp4 && del 5.mp4 && del 6.mp4 && del 7.mp4 && del 8.mp4 && del 9.mp4 && del 10.mp4 && del 11.mp4 && del 12.mp4 && del 13.mp4 && del 14.mp4")
 print("Done!")
