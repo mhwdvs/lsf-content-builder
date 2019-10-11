@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 import lxml
 import re
 import os
@@ -20,6 +21,8 @@ print("")
 # define runtime variables
 fadetime = 24*3 #3 seconds
 fadein = fadetime
+options = Options()
+options.add_argument("--headless")
 
 # funtion to get duration of clip in frames
 def getLength(filename):
@@ -66,7 +69,7 @@ clips = 0
 print("ENUMERATING CLIPS:")
 for link in links:
     print("Navigating to clip" + str(clips) + "!")
-    browser = webdriver.Chrome()
+    browser = webdriver.Chrome(chrome_options=options)
     browser.get(link)
     delay = 5 #seconds
 
