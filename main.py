@@ -118,7 +118,7 @@ for i in range(len(videourls)):
 
     # all files will be made into 1080p, 24fps format to prevent any issues later on
     # this has to be done seperate from fades, because fadeout transition relies on number of frames, which changes
-    os.system("ffmpeg -i " + clipname + """ -vf scale=1920:1080,fps=fps=24,drawtext="fontfile=Lato-Bold.ttf:text='""" + str(titles[i]) +"""':fontcolor=white:fontsize=40:box=1:boxcolor=black@0.5:boxborderw=5:x=0:y=0" """ + outname)
+    os.system("ffmpeg -i " + clipname + """ -c copy -vf scale=1920:1080,fps=fps=24,drawtext="fontfile=Lato-Bold.ttf:text='""" + str(titles[i]) +"""':fontcolor=white:fontsize=40:box=1:boxcolor=black@0.5:boxborderw=5:x=0:y=0" """ + outname)
     os.system("del " + clipname)
 
     # Add overlay with clip title here
@@ -127,7 +127,7 @@ for i in range(len(videourls)):
     fadeout = frames - fadetime     # Gets the time in frames when the fadeout transition should begin
 
     # adds in and out fades and transcodes to MPEG2 simultaneously
-    os.system("ffmpeg -i " + outname + """ -vf "fade=in:0:""" + str(fadein) + ",fade=out:"+ str(fadeout) + ":" + str(fadetime) + """" """ + str(i) + ".mp4")
+    os.system("ffmpeg -i " + outname + """ -c copy -bsf h264_mp4toannexb -vf "fade=in:0:""" + str(fadein) + ",fade=out:"+ str(fadeout) + ":" + str(fadetime) + """" """ + str(i) + ".ts")
     os.system("del " + outname)
 
 print("<----------------------->")
@@ -139,6 +139,6 @@ named_tuple = time.localtime()
 time_string = time.strftime("%d-%m-%y", named_tuple)
 os.system("mkdir " + time_string)
 # combines all faded files together and transcodes them back to mp4
-os.system("ffmpeg -safe 0 -f concat -i mylist.txt -c copy " + time_string + "/output.mp4")
-os.system("del 0.mp4 && del 1.mp4 && del 2.mp4 && del 3.mp4 && del 4.mp4 && del 5.mp4 && del 6.mp4 && del 7.mp4 && del 8.mp4 && del 9.mp4 && del 10.mp4 && del 11.mp4 && del 12.mp4 && del 13.mp4 && del 14.mp4")
+os.system("ffmpeg -safe 0 -f concat -i mylist.txt -c copy -absf aac_adtstoasc " + time_string + "/output.mp4")
+os.system("del 0.ts && del 1.ts && del 2.ts && del 3.ts && del 4.ts && del 5.ts && del 6.ts && del 7.ts && del 8.ts && del 9.ts && del 10.ts && del 11.ts && del 12.ts && del 13.ts && del 14.ts")
 print("Done!")
