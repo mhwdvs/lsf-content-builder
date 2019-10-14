@@ -12,3 +12,8 @@ Pipeline:
   - Use thumbnail of top clip as thumbnail of compilation
   - Use CLI youtube uploader to automatically post
   
+Install:
+
+  - Install ffmpeg
+  - Install dependancies via pip (use python 3.6 interpreter)
+  - Chose a font you'd like for the overlay and add its path to the arguments at line 120
