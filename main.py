@@ -9,6 +9,7 @@ import lxml
 import re
 import os
 import subprocess
+import time
 
 print("<------------------>")
 print("LSF CONTENT BUILDER")
@@ -133,7 +134,11 @@ print("<----------------------->")
 print("")
 
 print("RUNNING FINAL CONCAT AND TRANSCODE ON CLIPS!")
+# makes folder with date
+named_tuple = time.localtime()
+time_string = time.strftime("%d-%m-%y", named_tuple)
+os.system("mkdir " + time_string)
 # combines all faded files together and transcodes them back to mp4
-os.system("ffmpeg -safe 0 -f concat -i mylist.txt -c copy output.mp4")
+os.system("ffmpeg -safe 0 -f concat -i mylist.txt -c copy " + time_string + "/output.mp4")
 os.system("del 0.mp4 && del 1.mp4 && del 2.mp4 && del 3.mp4 && del 4.mp4 && del 5.mp4 && del 6.mp4 && del 7.mp4 && del 8.mp4 && del 9.mp4 && del 10.mp4 && del 11.mp4 && del 12.mp4 && del 13.mp4 && del 14.mp4")
 print("Done!")
