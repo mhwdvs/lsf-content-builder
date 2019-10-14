@@ -16,4 +16,10 @@ Install:
 
   - Install ffmpeg
   - Install dependancies via pip (use python 3.6 interpreter)
-  - Chose a font you'd like for the overlay and add its path to the arguments at line 120
+  - Chose a font you'd like for the overlay and add its path to the arguments at line 120 (I used Google's Lato-Bold.ttf, but I doubt that it's redistributable)
+
+To Do:
+
+  - Output to dated folder
+  - Output thumbnail of top clip
+  - Upload to YouTube via CLI
